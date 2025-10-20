@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Dashboard</title>
+        <!-- Linking the main CSS stylesheet dynamically using Flask's url_for for static files -->
+        <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    </head>
+
+    <body class="dashboard-page">
+        <h1 style="text-align: center;">Healthcare Packet Forensics Dashboard</h1>
+
+        <!-- Navigation link to return to the upload page -->
+        <a class="header-link" href="{{ url_for('index') }}">⬅ Upload another file</a>
+
+        <!-- Display summary information for the uploaded PCAP -->
+        <h2>PCAP Summary: {{ summary.filename }}</h2>
+        <p><strong>Packets analyzed:</strong> {{ summary.packet_count or 0 }}</p>
+        <p><strong>Total alerts:</strong> {{ summary.alerts | length }}</p>
+
+        <!-- Display top talkers (IP addresses with most packets) -->
+        <h3>Top Talkers</h3>
+        <table>
+            <tr><th>IP</th>
+                <th>Packets</th>
+            </tr>
+            {% for talker in (summary.top_talkers or []) %}
+            <tr>
+                <td>{{ talker[0] }}</td>
+                <td>{{ talker[1] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <!-- Display protocol distribution as a list -->
+        <div class="card">
+            <h3>Protocol Distribution</h3>
+            <ul>
+            {% for protocol, count in summary.protocol_counts.items() %}
+            <li>{{protocol}} - {{count}}</li>
+            {% endfor %}
+            </ul>
+        </div>
+
+        <!-- Display alerts generated from the PCAP analysis -->
+        <h3>Alerts</h3>
+        {% if summary.alerts %}
+            {% for alert in summary.alerts %}
+            <div class="alert">
+                <strong>{{ alert.type | upper }}</strong> — {{ alert.description }}
+                <!-- If the alert is tied to a specific packet, provide a link to view that packet -->
+                {% if alert.packet_id is defined %}
+                <a class="packet-link" href="{{ url_for('packet_view', filename=summary.filename, packet_id=alert.packet_id) }}">
+                    🔍 View Packet #{{ alert.packet_id }}
+                </a>
+                {% endif %}
+            </div>
+            {% endfor %}
+        {% else %}
+            <!-- Inform user if no alerts were detected -->
+            <p class="no-alerts">No alerts detected.</p>
+        {% endif %}
+    </body>
+</html>

@@ -1,0 +1,43 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Packet {{ packet.id }}</title>
+    <!-- Linking the main CSS stylesheet dynamically using Flask's url_for for static files -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  </head>
+
+  <body class="packet-page">
+    <h1>Packet {{ packet.id }}</h1>
+
+    <!-- Navigation links for returning to the upload page or dashboard -->
+    <p class="nav-links">
+      <a href="{{ url_for('index') }}">⬅ Upload</a> |
+      <a href="javascript:history.back()">Go Back To Dashboard</a>
+    </p> 
+    <!-- using "javascript:history.back()" is a quick and dirty way to go back to the dashboard of this current pcap file without having to create an entirely separate Flask route that handles return requests.-->
+
+    <!-- Packet metadata section -->
+    <h3>Metadata</h3>
+    <ul>
+      <li>ID: {{ packet.id }}</li>
+      <li>Timestamp: {{ packet.timestamp }}</li>
+      <li>Source: {{ packet.src }}</li>
+      <li>Destination: {{ packet.dst }}</li>
+      <li>Protocol: {{ packet.protocol }}</li>
+      <li>Dst port: {{ packet.dst_port }}</li>
+      <li>
+        {% if alert %}
+          <strong style="color: red;">Detected Attack:</strong>
+          {{ alert.get("description", "Unknown Attack") }}
+        {% else %}
+          <em>No specific attacks detected for this packet.</em>
+        {% endif %}
+      </li>
+    </ul>
+
+    <!-- Payload display section -->
+    <h3>Payload (truncated)</h3>  <!-- i limited the payload to the first 2000 characters for performance reasons, because if the payload is too long, it will take the browser a long time to load. --> 
+    <pre>{{ packet.payload[:2000] or "(empty)" }}</pre>
+  </body>
+</html>

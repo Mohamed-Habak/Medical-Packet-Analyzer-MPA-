@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Healthcare Packet Forensics - Upload</title>
+    <!-- Linking the main CSS stylesheet dynamically using Flask's url_for for static files -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  </head>
+  <body class="upload-page">
+    <div class="container">
+      <h1>Upload PCAP File</h1>
+
+      <!-- Display flashed messages from Flask with appropriate styling -->
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, msg in messages %}
+            <div class="alert {{ 'danger' if category=='danger' else 'info' }}">{{ msg }}</div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+    
+      <!-- Inform users about upload limitations, project scope, and expected behavior -->
+      <h3>Important Notes</h3>
+      <ul>
+        <li><strong>Educational Use Only:</strong> This application is intended <strong>solely for research and educational purposes</strong>. It analyzes previously captured PCAP files and is <strong>not</strong> designed for real-time monitoring or deployment on live medical systems.</li>
+        <li><strong>Privacy & Legal Notice:</strong> Please avoid uploading PCAP files containing real patient data, personal identifiers, or confidential information. Processing PHI (Protected Health Information) without authorization may violate privacy laws.</li>
+        <li><strong>HL7 Traffic Focus:</strong> The analyzer detects anomalies in <strong>unencrypted HL7 medical network traffic</strong> (segments such as <code>MSH|</code>, <code>PID|</code>, <code>OBR|</code>). It identifies patterns that may indicate replay, data exfiltration, or traffic spikes.</li>
+        <li><strong>Encrypted Traffic:</strong> Encrypted packets are <strong>intentionally excluded</strong> from analysis, as decryption would require access to private keys or interception methods outside the ethical and technical scope of this project.</li>
+        <li><strong>Unencrypted HL7 Alerts:</strong> These alerts appear whenever plaintext HL7-like content is detected without TLS/SSL encryption. This does <strong>not</strong> indicate an error — it simply confirms that readable HL7 traffic was found. Because the analyzer ignores encrypted packets, this alert will <strong>almost always trigger</strong> when processing real HL7 data.</li>
+        <li><strong>Detection Method:</strong> Pattern-based detection (keyword and segment matching) is used instead of full HL7 protocol parsing. This design keeps the tool lightweight but may produce false positives when non-HL7 traffic contains similar text patterns.</li>
+        <li><strong>Limitations & Future Work:</strong> DICOM (medical imaging) traffic is not analyzed in the current version. Future updates aim to add optional parsing for DICOM-based systems (e.g., PACS servers) to detect insecure image transfers.</li>
+      </ul> 
+
+      <!-- Create a file upload form that accepts only PCAP/PCAPNG files and posts to Flask's upload route -->
+      <form action="{{ url_for('upload') }}" method="post" enctype="multipart/form-data">
+        <input type="file" name="pcap" accept=".pcap,.pcapng" required><br>
+        <button type="submit">Upload</button>
+      </form>
+    </div>
+  </body>
+</html>
