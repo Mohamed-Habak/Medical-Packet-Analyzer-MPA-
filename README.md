@@ -163,8 +163,3 @@ In a real commercial-grade implementation, decrypted packets would pass through 
 During development, I used **ChatGPT** as a study and assistance tool to clarify Flask and Python concepts, generate initial code skeletons, and improve documentation comments.
 All final logic, implementation, debugging, and testing decisions were my own.
 
----
-
-## License
-
-This project was created as part of **CS50x's Final Project** and is open for **educational use only**.
